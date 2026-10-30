@@ -140,7 +140,7 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
     <!-- Category Selector Controls -->
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div class="mb-6">
       <div class="flex items-center space-x-2 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800">
         <button onclick="switchCategory('default')" id="btn-default" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-md transition-all">
           <i class="fa-solid fa-star mr-1.5"></i> Featured
@@ -148,11 +148,6 @@
         <button onclick="switchCategory('top50')" id="btn-top50" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
           <i class="fa-solid fa-chart-pie mr-1.5"></i> Top 50 Crypto
         </button>
-      </div>
-
-      <div class="text-xs text-gray-400 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span id="active-list-count">Showing 5 Assets</span>
       </div>
     </div>
 
@@ -267,7 +262,6 @@
         activeSymbols = top50Symbols.length ? top50Symbols : ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'DOT'];
       }
 
-      document.getElementById('active-list-count').innerText = `Showing ${activeSymbols.length} Assets`;
       renderTable();
       initCryptoFeeds();
     }
