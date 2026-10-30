@@ -28,6 +28,7 @@
     }
   </script>
 
+  <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-tickers.js"></script>
 
   <style>
     body {
@@ -66,96 +67,51 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
   </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-32">
 
   <!-- Header -->
   <header class="glass-panel sticky top-0 z-50 border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <i class="fa-solid font-bold text-white text-lg fa-chart-line"></i>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <i class="fa-solid font-bold text-white text-lg fa-chart-line"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              MyNet Market <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">LIVE</span>
+            </h1>
+            <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Market Ticker</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-            MyNet Market <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">LIVE</span>
-          </h1>
-          <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Market Ticker</p>
-        </div>
-      </div>
-      </div>
 
-      <div class="flex items-center space-x-3">
-        <div class="flex items-center space-x-2 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-lg text-xs">
+        <div class="flex flex-wrap items-center gap-2" aria-label="World clocks">
+          <div class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/70 px-2.5 py-1.5">
+            <div>
+              <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
+              <span id="utc-date" class="block text-[10px] text-gray-500"></span>
+            </div>
+            <time id="utc-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
+          </div>
+          <div class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/70 px-2.5 py-1.5">
+            <div>
+              <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
+              <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
+            </div>
+            <time id="myanmar-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
+          </div>
+        </div>
+
+        <div class="ml-auto flex items-center space-x-2 self-start rounded-lg border border-gray-800 bg-gray-900/80 px-3 py-1.5 text-xs">
           <span id="ws-indicator" class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse"></span>
           <span id="ws-status-text" class="text-gray-300 font-medium hidden sm:inline">Connecting...</span>
         </div>
       </div>
-
-    </header>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-2"></div>
-    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-tickers.js"></script>
-
-    <tv-tickers symbols="OANDA:XAUUSD,OANDA:EURUSD,CAPITALCOM:DXY,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" hide-chart  theme="dark"></tv-tickers>
     </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-2">
-      <div class="flex flex-col lg:flex-row items-stretch gap-3">
-        <div id="tradingview-forex-widget" class="tradingview-widget-container min-w-0 flex-1">
-          <div class="tradingview-widget-container__widget"></div>
-        </div>
-      </div>
-      <p id="forex-widget-status" class="text-xs text-gray-500 mt-1">
-        Loading major forex quotes…
-      </p>
-      <div class="mt-2 flex flex-wrap justify-start gap-2" aria-label="World clocks">
-        <div class="flex min-w-[170px] items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
-          <div>
-            <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
-            <span id="utc-date" class="block text-[10px] text-gray-500"></span>
-          </div>
-          <time id="utc-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
-        </div>
-        <div class="flex min-w-[190px] items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
-          <div>
-            <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
-            <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
-          </div>
-          <time id="myanmar-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
-        </div>
-      </div>
-    </div>
-  
+  </header>
 
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-
-    <!-- Overview Bar -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-      <!-- 1. Spot Gold -->
-      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
-        <div class="p-3 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
-          <i class="fa-solid fa-coins text-xl"></i>
-        </div>
-        <div>
-          <span class="text-xs text-gray-400 block font-medium">Spot Gold (XAU)</span>
-          <span id="summary-gold" class="text-base font-bold text-white">$0.00</span>
-        </div>
-      </div>
-
-      <!-- 2. Bitcoin -->
-      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
-        <div class="p-3 rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-          <i class="fa-brands fa-bitcoin text-xl"></i>
-        </div>
-        <div>
-          <span class="text-xs text-gray-400 block font-medium">Bitcoin (BTC)</span>
-          <span id="summary-btc" class="text-base font-bold text-white">$0.00</span>
-        </div>
-      </div>
-
-    </div>
 
     <!-- Category Selector Controls -->
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -206,6 +162,12 @@
   </main>
 
 
+  <div class="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-800 bg-[#0b0f19]/95 shadow-[0_-8px_24px_rgba(0,0,0,0.3)] backdrop-blur">
+    <div class="mx-auto max-w-7xl px-2 sm:px-4">
+      <tv-tickers symbols="OANDA:XAUUSD,OANDA:EURUSD,CAPITALCOM:DXY,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" hide-chart theme="dark" style="display:block;width:100%;"></tv-tickers>
+    </div>
+  </div>
+
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-gray-500">
     <p>Powered by MyNet Market • Live Tickers</p>
   </footer>
@@ -220,21 +182,9 @@
       BNB: { name: 'Binance Coin', symbol: 'BNB', pair: 'bnbusdt', category: 'Crypto', icon: 'fa-solid fa-cube', color: '#F3BA2F', price: 0, change: 0, high: 0, low: 0 }
     };
 
-    const FOREX_TICKER_SYMBOLS = [
-      { proName: 'FOREXCOM:EURUSD', title: 'EUR/USD' },
-      { proName: 'FOREXCOM:GBPUSD', title: 'GBP/USD' },
-      { proName: 'FOREXCOM:USDJPY', title: 'USD/JPY' },
-      { proName: 'FOREXCOM:USDCHF', title: 'USD/CHF' },
-      { proName: 'FOREXCOM:AUDUSD', title: 'AUD/USD' },
-      { proName: 'FOREXCOM:USDCAD', title: 'USD/CAD' },
-      { proName: 'FOREXCOM:NZDUSD', title: 'NZD/USD' },
-      { proName: 'CAPITALCOM:DXY', title: 'DXY' }
-    ];
-
     // State
     let top50Symbols = [];
     let activeSymbols = ['XAU', 'BTC', 'ETH', 'SOL', 'BNB'];
-    let tradingViewWidgetsLoaded = false;
 
     function updateWorldClocks() {
       const now = new Date();
@@ -299,34 +249,6 @@
       document.getElementById('active-list-count').innerText = `Showing ${activeSymbols.length} Assets`;
       renderTable();
       initCryptoFeeds();
-    }
-
-    function loadTradingViewForexWidget() {
-      if (tradingViewWidgetsLoaded) return;
-      const status = document.getElementById('forex-widget-status');
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.async = true;
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
-      script.textContent = JSON.stringify({
-        symbols: FOREX_TICKER_SYMBOLS,
-        showSymbolLogo: false,
-        isTransparent: true,
-        displayMode: 'adaptive',
-        colorTheme: 'dark',
-        locale: 'en'
-      });
-      script.onload = () => {
-        status.innerText = 'Forex and DXY quotes by TradingView. Availability and timing depend on its data providers.';
-      };
-      script.onerror = () => {
-        tradingViewWidgetsLoaded = false;
-        status.innerText = 'Could not load the TradingView ticker. Check your connection or browser content blockers.';
-        status.className = 'text-xs text-rose-400 mt-3';
-      };
-
-      document.getElementById('tradingview-forex-widget').appendChild(script);
-      tradingViewWidgetsLoaded = true;
     }
 
     // Render Table
@@ -399,9 +321,6 @@
           : '<span class="text-gray-400">—</span>';
       }
 
-      // Summary Bar Updates
-      if (symbol === 'XAU') document.getElementById('summary-gold').innerText = formattedPrice;
-      if (symbol === 'BTC') document.getElementById('summary-btc').innerText = formattedPrice;
     }
 
     // Top 50 Crypto Fetcher
@@ -537,7 +456,6 @@
     window.onload = async function() {
       updateWorldClocks();
       setInterval(updateWorldClocks, 1000);
-      loadTradingViewForexWidget();
       await loadTop50Crypto();
       switchCategory('default');
       initGoldData();
