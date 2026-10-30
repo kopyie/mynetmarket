@@ -79,7 +79,7 @@
           <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
             MyNet Market <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">LIVE</span>
           </h1>
-          <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Real-Time Ticker</p>
+          <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Market Ticker</p>
         </div>
       </div>
 
@@ -115,8 +115,8 @@
           <i class="fa-solid fa-money-bill-transfer text-xl"></i>
         </div>
         <div>
-          <span class="text-xs text-gray-400 block font-medium">EUR / USD</span>
-          <span id="summary-eurusd" class="text-base font-bold text-white">$0.0000</span>
+          <span class="text-xs text-gray-400 block font-medium">Major Forex Pairs</span>
+          <button onclick="switchCategory('forex')" class="text-xs font-semibold text-indigo-300 hover:text-indigo-200">Open live quotes</button>
         </div>
       </div>
 
@@ -161,35 +161,47 @@
 
       <div class="text-xs text-gray-400 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span id="active-list-count">Showing 7 Assets</span>
+        <span id="active-list-count">Showing 5 Assets</span>
       </div>
     </div>
 
-    <!-- Market Overview Table -->
+    <!-- Market Data -->
     <div class="glass-panel rounded-2xl p-6 border border-gray-800 mb-8">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-bold text-white">Market Overview Table</h2>
-          <p class="text-xs text-gray-400">Live prices, 24h performance, high/low boundaries</p>
+          <h2 id="market-view-title" class="text-lg font-bold text-white">Market Overview Table</h2>
+          <p id="market-view-description" class="text-xs text-gray-400">Live prices, change, high/low boundaries</p>
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <div id="market-table-container" class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="text-xs uppercase text-gray-400 border-b border-gray-800 pb-3">
               <th class="py-3 px-4 w-12 text-center">#</th>
               <th class="py-3 px-4">Asset</th>
               <th class="py-3 px-4">Price</th>
-              <th class="py-3 px-4">24h Change</th>
-              <th class="py-3 px-4 hidden sm:table-cell">24h High</th>
-              <th class="py-3 px-4 hidden sm:table-cell text-right">24h Low</th>
+              <th class="py-3 px-4">Change</th>
+              <th class="py-3 px-4 hidden sm:table-cell">High</th>
+              <th class="py-3 px-4 hidden sm:table-cell text-right">Low</th>
             </tr>
           </thead>
           <tbody id="market-table-body" class="divide-y divide-gray-800/60 text-sm">
             <!-- Table rows populate dynamically -->
           </tbody>
         </table>
+      </div>
+
+      <div id="forex-widget-container" class="hidden">
+        <div id="tradingview-forex-widget" class="tradingview-widget-container min-h-16 w-full"></div>
+        <p id="forex-widget-status" class="text-xs text-gray-400 mt-3">
+          Live quotes load when the forex widget is opened.
+        </p>
+        <p class="text-xs text-gray-500 mt-2">
+          Forex quotes provided by
+          <a href="https://www.tradingview.com/markets/currencies/" target="_blank" rel="noopener noreferrer" class="text-indigo-300 hover:text-indigo-200">TradingView</a>.
+          Quote availability and delay depend on the data provider.
+        </p>
       </div>
     </div>
 
@@ -200,40 +212,40 @@
   </footer>
 
   <script>
-    // Primary Seed List in requested order: XAU, EUR/USD, USD Index, BTC, ETH, SOL, BNB
+    // Featured list keeps the original gold and crypto assets.
     const ASSETS = {
-      XAU: { name: 'Spot Gold', symbol: 'XAU', pair: 'xauusd', category: 'Commodity', icon: 'fa-solid fa-coins', color: '#EAB308', price: 4015.50, change: -0.37, high: 4026.43, low: 3928.66 },
-      EURUSD: { name: 'EUR / USD', symbol: 'EUR', pair: 'eurusd', category: 'Forex', icon: 'fa-solid fa-money-bill-transfer', color: '#6366F1', price: 1.0850, change: 0.12, high: 1.0890, low: 1.0810 },
-      DXY: { name: 'US Dollar Index', symbol: 'DXY', pair: 'dxy', category: 'Forex Index', icon: 'fa-solid fa-dollar-sign', color: '#3B82F6', price: 101.75, change: -0.08, high: 102.10, low: 101.40 },
+      XAU: { name: 'Spot Gold', symbol: 'XAU', pair: 'xauusd', category: 'Commodity', icon: 'fa-solid fa-coins', color: '#EAB308', price: 0, change: 0, high: 0, low: 0 },
       BTC: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', category: 'Crypto', icon: 'fa-brands fa-bitcoin', color: '#F7931A', price: 0, change: 0, high: 0, low: 0 },
       ETH: { name: 'Ethereum', symbol: 'ETH', pair: 'ethusdt', category: 'Crypto', icon: 'fa-brands fa-ethereum', color: '#627EEA', price: 0, change: 0, high: 0, low: 0 },
       SOL: { name: 'Solana', symbol: 'SOL', pair: 'solusdt', category: 'Crypto', icon: 'fa-solid fa-sun', color: '#14F195', price: 0, change: 0, high: 0, low: 0 },
       BNB: { name: 'Binance Coin', symbol: 'BNB', pair: 'bnbusdt', category: 'Crypto', icon: 'fa-solid fa-cube', color: '#F3BA2F', price: 0, change: 0, high: 0, low: 0 }
     };
 
-    // Major Forex Pairs
-    const FOREX_PAIRS = ['EURUSD', 'DXY', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'];
-    const FOREX_DEFS = {
-      GBPUSD: { name: 'GBP / USD', symbol: 'GBP', pair: 'gbpusd', category: 'Forex', icon: 'fa-solid fa-pound-sign', color: '#10B981', price: 1.2950, change: 0.15, high: 1.2990, low: 1.2910 },
-      USDJPY: { name: 'USD / JPY', symbol: 'JPY', pair: 'usdjpy', category: 'Forex', icon: 'fa-solid fa-yen-sign', color: '#EF4444', price: 152.30, change: -0.22, high: 153.10, low: 151.80 },
-      USDCHF: { name: 'USD / CHF', symbol: 'CHF', pair: 'usdchf', category: 'Forex', icon: 'fa-solid fa-franc-sign', color: '#F59E0B', price: 0.8650, change: 0.05, high: 0.8680, low: 0.8620 },
-      AUDUSD: { name: 'AUD / USD', symbol: 'AUD', pair: 'audusd', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#8B5CF6', price: 0.6620, change: 0.28, high: 0.6650, low: 0.6590 },
-      USDCAD: { name: 'USD / CAD', symbol: 'CAD', pair: 'usdcad', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#EC4899', price: 1.3820, change: -0.10, high: 1.3860, low: 1.3790 },
-      NZDUSD: { name: 'NZD / USD', symbol: 'NZD', pair: 'nzdusd', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#14F195', price: 0.5980, change: 0.18, high: 0.6010, low: 0.5950 }
-    };
+    const FOREX_TICKER_SYMBOLS = [
+      { proName: 'FOREXCOM:EURUSD', title: 'EUR/USD' },
+      { proName: 'FOREXCOM:GBPUSD', title: 'GBP/USD' },
+      { proName: 'FOREXCOM:USDJPY', title: 'USD/JPY' },
+      { proName: 'FOREXCOM:USDCHF', title: 'USD/CHF' },
+      { proName: 'FOREXCOM:AUDUSD', title: 'AUD/USD' },
+      { proName: 'FOREXCOM:USDCAD', title: 'USD/CAD' },
+      { proName: 'FOREXCOM:NZDUSD', title: 'NZD/USD' }
+    ];
 
     // State
     let currentCategory = 'default';
     let top50Symbols = [];
-    let activeSymbols = ['XAU', 'EURUSD', 'DXY', 'BTC', 'ETH', 'SOL', 'BNB'];
+    let activeSymbols = ['XAU', 'BTC', 'ETH', 'SOL', 'BNB'];
+    let forexWidgetLoaded = false;
 
     function formatPrice(val, symbol = '') {
-      if (!val) return '$0.00';
+      if (!Number.isFinite(val) || val <= 0) return '—';
       let decimals = 2;
-      if (['EURUSD', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'].includes(symbol) || (val < 10 && val > 0 && !['DXY', 'USDJPY'].includes(symbol))) {
-        decimals = 4;
+      if (['EURUSD', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'].includes(symbol)) decimals = 5;
+      if (symbol === 'USDJPY' || symbol === 'DXY') decimals = 3;
+      if (['Forex', 'Forex Index'].includes(ASSETS[symbol]?.category)) {
+        return val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
       }
-      if (symbol === 'DXY' || symbol === 'USDJPY') decimals = 2;
+      if (val < 10 && val > 0) decimals = 4;
       return '$' + val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
@@ -251,19 +263,66 @@
       }
 
       if (category === 'default') {
-        activeSymbols = ['XAU', 'EURUSD', 'DXY', 'BTC', 'ETH', 'SOL', 'BNB'];
+        activeSymbols = ['XAU', 'BTC', 'ETH', 'SOL', 'BNB'];
       } else if (category === 'forex') {
-        activeSymbols = [...FOREX_PAIRS];
-        Object.keys(FOREX_DEFS).forEach(k => {
-          if (!ASSETS[k]) ASSETS[k] = FOREX_DEFS[k];
-        });
+        activeSymbols = FOREX_TICKER_SYMBOLS.map(symbol => symbol.title);
       } else if (category === 'top50') {
         activeSymbols = top50Symbols.length ? top50Symbols : ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'DOT'];
       }
 
-      document.getElementById('active-list-count').innerText = `Showing ${activeSymbols.length} Assets`;
-      renderTable();
+      const isForex = category === 'forex';
+      document.getElementById('active-list-count').innerText = isForex
+        ? `Showing ${activeSymbols.length} Forex Quotes`
+        : `Showing ${activeSymbols.length} Assets`;
+      document.getElementById('market-table-container').classList.toggle('hidden', isForex);
+      document.getElementById('forex-widget-container').classList.toggle('hidden', !isForex);
+      document.getElementById('market-view-title').innerText = isForex
+        ? 'Major Forex Pairs'
+        : 'Market Overview Table';
+      document.getElementById('market-view-description').innerText = isForex
+        ? 'Live forex prices from TradingView'
+        : 'Live prices, change, high/low boundaries';
+
+      if (isForex) {
+        loadTradingViewForexWidget();
+      } else {
+        renderTable();
+      }
       initCryptoFeeds();
+    }
+
+    function loadTradingViewForexWidget() {
+      if (forexWidgetLoaded) return;
+
+      const widget = document.getElementById('tradingview-forex-widget');
+      const status = document.getElementById('forex-widget-status');
+      const widgetContent = document.createElement('div');
+      widgetContent.className = 'tradingview-widget-container__widget';
+      widget.replaceChildren(widgetContent);
+
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+      script.textContent = JSON.stringify({
+        symbols: FOREX_TICKER_SYMBOLS,
+        showSymbolLogo: false,
+        isTransparent: true,
+        displayMode: 'adaptive',
+        colorTheme: 'dark',
+        locale: 'en'
+      });
+      script.onload = () => {
+        status.innerText = 'TradingView widget loaded. Quote availability and timing depend on the provider.';
+      };
+      script.onerror = () => {
+        forexWidgetLoaded = false;
+        status.innerText = 'Could not load the TradingView widget. Check your connection or browser content blockers.';
+        status.className = 'text-xs text-rose-400 mt-3';
+      };
+
+      forexWidgetLoaded = true;
+      widget.appendChild(script);
     }
 
     // Render Table
@@ -306,6 +365,7 @@
       if (!asset) return;
 
       const formattedPrice = formatPrice(asset.price, symbol);
+      const hasData = Number.isFinite(asset.price) && asset.price > 0;
       const isUp = asset.change >= 0;
 
       const tblPriceEl = document.getElementById(`tbl-price-${symbol}`);
@@ -327,15 +387,16 @@
 
       const tblChangeEl = document.getElementById(`tbl-change-${symbol}`);
       const sign = isUp ? '+' : '';
-      const changeStr = `${sign}${asset.change.toFixed(2)}%`;
+      const changeStr = hasData ? `${sign}${asset.change.toFixed(2)}%` : '—';
 
       if (tblChangeEl) {
-        tblChangeEl.innerHTML = `<span class="${isUp ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}">${changeStr}</span>`;
+        tblChangeEl.innerHTML = hasData
+          ? `<span class="${isUp ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}">${changeStr}</span>`
+          : '<span class="text-gray-400">—</span>';
       }
 
       // Summary Bar Updates
       if (symbol === 'XAU') document.getElementById('summary-gold').innerText = formattedPrice;
-      if (symbol === 'EURUSD') document.getElementById('summary-eurusd').innerText = formattedPrice;
       if (symbol === 'BTC') document.getElementById('summary-btc').innerText = formattedPrice;
     }
 
@@ -415,7 +476,7 @@
             }
           }
         } catch (proxyErr) {
-          console.warn('Gold API Proxy fetch failed, falling back to realistic tick loop.', proxyErr);
+          console.warn('Gold API Proxy fetch failed.', proxyErr);
         }
       }
 
@@ -424,23 +485,8 @@
 
     // Initialize Spot Gold with Live API & Periodic Refresh
     async function initGoldData() {
-      const gold = ASSETS.XAU;
-      
-      // Initial fetch attempt
       await fetchLiveGoldPrice();
-
-      // Refresh live API every 30 seconds
       setInterval(fetchLiveGoldPrice, 30000);
-
-      // Micro-tick loop for real-time visual movement between API refreshes
-      setInterval(() => {
-        const prevPrice = gold.price;
-        const deltaPct = (Math.random() - 0.49) * 0.0004;
-        gold.price = parseFloat((gold.price * (1 + deltaPct)).toFixed(2));
-        if (gold.price > gold.high) gold.high = gold.price;
-        if (gold.price < gold.low) gold.low = gold.price;
-        updateAssetUI('XAU', prevPrice);
-      }, 4000);
     }
 
     // Feed Controller for Crypto
@@ -489,27 +535,10 @@
       }
     }
 
-    // Live Feed Generators for Forex & DXY
-    function initNonCryptoFeeds() {
-      setInterval(() => {
-        ['EURUSD', 'DXY', ...Object.keys(FOREX_DEFS)].forEach(sym => {
-          if (!ASSETS[sym]) return;
-          const asset = ASSETS[sym];
-          const prevPrice = asset.price;
-          const tick = (Math.random() - 0.495) * (sym === 'DXY' ? 0.02 : 0.0003);
-          asset.price = parseFloat((asset.price + tick).toFixed(sym === 'DXY' ? 2 : 4));
-          if (asset.price > asset.high) asset.high = asset.price;
-          if (asset.price < asset.low) asset.low = asset.price;
-          updateAssetUI(sym, prevPrice);
-        });
-      }, 4000);
-    }
-
     window.onload = async function() {
       await loadTop50Crypto();
       switchCategory('default');
       initGoldData();
-      initNonCryptoFeeds();
     };
   </script>
 </body>
