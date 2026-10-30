@@ -28,6 +28,7 @@
     }
   </script>
 
+
   <style>
     body {
       background-color: #0b0f19;
@@ -82,6 +83,7 @@
           <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Market Ticker</p>
         </div>
       </div>
+      </div>
 
       <div class="flex items-center space-x-3">
         <div class="flex items-center space-x-2 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-lg text-xs">
@@ -90,7 +92,14 @@
         </div>
       </div>
 
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-2"></div>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-tickers.js"></script>
+
+    <tv-tickers symbols="OANDA:XAUUSD,OANDA:EURUSD,CAPITALCOM:DXY,BINANCE:BTCUSDT,BINANCE:ETHUSD,BINANCE:BNBUSDT" hide-chart  theme="dark"></tv-tickers>
     </div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-2">
       <div class="flex flex-col lg:flex-row items-stretch gap-3">
         <div id="tradingview-forex-widget" class="tradingview-widget-container min-w-0 flex-1">
@@ -100,20 +109,24 @@
       <p id="forex-widget-status" class="text-xs text-gray-500 mt-1">
         Loading major forex quotes…
       </p>
-      <div class="mt-2 grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:gap-3" aria-label="World clocks">
-        <div class="rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
-          <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
-          <time id="utc-clock" class="block font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
-          <span id="utc-date" class="block text-[10px] text-gray-500"></span>
+      <div class="mt-2 flex flex-wrap justify-start gap-2" aria-label="World clocks">
+        <div class="flex min-w-[170px] items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
+          <div>
+            <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
+            <span id="utc-date" class="block text-[10px] text-gray-500"></span>
+          </div>
+          <time id="utc-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
         </div>
-        <div class="rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
-          <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
-          <time id="myanmar-clock" class="block font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
-          <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
+        <div class="flex min-w-[190px] items-center justify-between gap-3 rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
+          <div>
+            <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
+            <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
+          </div>
+          <time id="myanmar-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
         </div>
       </div>
     </div>
-  </header>
+  
 
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
@@ -191,6 +204,7 @@
     </div>
 
   </main>
+
 
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-gray-500">
     <p>Powered by MyNet Market • Live Tickers</p>
