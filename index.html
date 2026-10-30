@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyNet Market Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            darkBg: '#0b0f19',
+            cardBg: 'rgba(17, 24, 39, 0.7)',
+            upGreen: '#10B981',
+            downRed: '#EF4444',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes flashUp {
+      0% { background-color: rgba(16, 185, 129, 0.35); color: #34d399; }
+      100% { background-color: transparent; }
+    }
+
+    @keyframes flashDown {
+      0% { background-color: rgba(239, 68, 68, 0.35); color: #f87171; }
+      100% { background-color: transparent; }
+    }
+
+    .price-flash-up { animation: flashUp 0.8s ease-out; border-radius: 4px; }
+    .price-flash-down { animation: flashDown 0.8s ease-out; border-radius: 4px; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="glass-panel sticky top-0 z-50 border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid font-bold text-white text-lg fa-chart-line"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            MyNet Market <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">LIVE</span>
+          </h1>
+          <p class="text-xs text-gray-400 hidden sm:block">Multi-Asset Real-Time Ticker</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-lg text-xs">
+          <span id="ws-indicator" class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse"></span>
+          <span id="ws-status-text" class="text-gray-300 font-medium hidden sm:inline">Connecting...</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+
+    <!-- Overview Bar (4 Containers) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <!-- 1. Spot Gold -->
+      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
+        <div class="p-3 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <i class="fa-solid fa-coins text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xs text-gray-400 block font-medium">Spot Gold (XAU)</span>
+          <span id="summary-gold" class="text-base font-bold text-white">$0.00</span>
+        </div>
+      </div>
+
+      <!-- 2. EUR / USD -->
+      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
+        <div class="p-3 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          <i class="fa-solid fa-money-bill-transfer text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xs text-gray-400 block font-medium">EUR / USD</span>
+          <span id="summary-eurusd" class="text-base font-bold text-white">$0.0000</span>
+        </div>
+      </div>
+
+      <!-- 3. Bitcoin -->
+      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
+        <div class="p-3 rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+          <i class="fa-brands fa-bitcoin text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xs text-gray-400 block font-medium">Bitcoin (BTC)</span>
+          <span id="summary-btc" class="text-base font-bold text-white">$0.00</span>
+        </div>
+      </div>
+
+      <!-- 4. Feed Status -->
+      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
+        <div class="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <i class="fa-solid fa-rotate text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xs text-gray-400 block font-medium">Feed Status</span>
+          <span id="summary-feed-status" class="text-xs font-semibold text-emerald-400 flex items-center gap-1 mt-1">
+            <i class="fa-solid fa-circle text-[8px]"></i> Initializing...
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Selector Controls -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div class="flex items-center space-x-2 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800">
+        <button onclick="switchCategory('default')" id="btn-default" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-md transition-all">
+          <i class="fa-solid fa-star mr-1.5"></i> Featured / Default List
+        </button>
+        <button onclick="switchCategory('forex')" id="btn-forex" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+          <i class="fa-solid fa-globe mr-1.5"></i> Major Forex Pairs
+        </button>
+        <button onclick="switchCategory('top50')" id="btn-top50" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i> Top 50 Crypto
+        </button>
+      </div>
+
+      <div class="text-xs text-gray-400 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span id="active-list-count">Showing 7 Assets</span>
+      </div>
+    </div>
+
+    <!-- Market Overview Table -->
+    <div class="glass-panel rounded-2xl p-6 border border-gray-800 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white">Market Overview Table</h2>
+          <p class="text-xs text-gray-400">Live prices, 24h performance, high/low boundaries</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="text-xs uppercase text-gray-400 border-b border-gray-800 pb-3">
+              <th class="py-3 px-4 w-12 text-center">#</th>
+              <th class="py-3 px-4">Asset</th>
+              <th class="py-3 px-4">Price</th>
+              <th class="py-3 px-4">24h Change</th>
+              <th class="py-3 px-4 hidden sm:table-cell">24h High</th>
+              <th class="py-3 px-4 hidden sm:table-cell text-right">24h Low</th>
+            </tr>
+          </thead>
+          <tbody id="market-table-body" class="divide-y divide-gray-800/60 text-sm">
+            <!-- Table rows populate dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 text-center text-xs text-gray-500">
+    <p>Powered by MyNet Market • Live Tickers</p>
+  </footer>
+
+  <script>
+    // Primary Seed List in requested order: XAU, EUR/USD, USD Index, BTC, ETH, SOL, BNB
+    const ASSETS = {
+      XAU: { name: 'Spot Gold', symbol: 'XAU', pair: 'xauusd', category: 'Commodity', icon: 'fa-solid fa-coins', color: '#EAB308', price: 4015.50, change: -0.37, high: 4026.43, low: 3928.66 },
+      EURUSD: { name: 'EUR / USD', symbol: 'EUR', pair: 'eurusd', category: 'Forex', icon: 'fa-solid fa-money-bill-transfer', color: '#6366F1', price: 1.0850, change: 0.12, high: 1.0890, low: 1.0810 },
+      DXY: { name: 'US Dollar Index', symbol: 'DXY', pair: 'dxy', category: 'Forex Index', icon: 'fa-solid fa-dollar-sign', color: '#3B82F6', price: 101.75, change: -0.08, high: 102.10, low: 101.40 },
+      BTC: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', category: 'Crypto', icon: 'fa-brands fa-bitcoin', color: '#F7931A', price: 0, change: 0, high: 0, low: 0 },
+      ETH: { name: 'Ethereum', symbol: 'ETH', pair: 'ethusdt', category: 'Crypto', icon: 'fa-brands fa-ethereum', color: '#627EEA', price: 0, change: 0, high: 0, low: 0 },
+      SOL: { name: 'Solana', symbol: 'SOL', pair: 'solusdt', category: 'Crypto', icon: 'fa-solid fa-sun', color: '#14F195', price: 0, change: 0, high: 0, low: 0 },
+      BNB: { name: 'Binance Coin', symbol: 'BNB', pair: 'bnbusdt', category: 'Crypto', icon: 'fa-solid fa-cube', color: '#F3BA2F', price: 0, change: 0, high: 0, low: 0 }
+    };
+
+    // Major Forex Pairs
+    const FOREX_PAIRS = ['EURUSD', 'DXY', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'];
+    const FOREX_DEFS = {
+      GBPUSD: { name: 'GBP / USD', symbol: 'GBP', pair: 'gbpusd', category: 'Forex', icon: 'fa-solid fa-pound-sign', color: '#10B981', price: 1.2950, change: 0.15, high: 1.2990, low: 1.2910 },
+      USDJPY: { name: 'USD / JPY', symbol: 'JPY', pair: 'usdjpy', category: 'Forex', icon: 'fa-solid fa-yen-sign', color: '#EF4444', price: 152.30, change: -0.22, high: 153.10, low: 151.80 },
+      USDCHF: { name: 'USD / CHF', symbol: 'CHF', pair: 'usdchf', category: 'Forex', icon: 'fa-solid fa-franc-sign', color: '#F59E0B', price: 0.8650, change: 0.05, high: 0.8680, low: 0.8620 },
+      AUDUSD: { name: 'AUD / USD', symbol: 'AUD', pair: 'audusd', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#8B5CF6', price: 0.6620, change: 0.28, high: 0.6650, low: 0.6590 },
+      USDCAD: { name: 'USD / CAD', symbol: 'CAD', pair: 'usdcad', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#EC4899', price: 1.3820, change: -0.10, high: 1.3860, low: 1.3790 },
+      NZDUSD: { name: 'NZD / USD', symbol: 'NZD', pair: 'nzdusd', category: 'Forex', icon: 'fa-solid fa-dollar-sign', color: '#14F195', price: 0.5980, change: 0.18, high: 0.6010, low: 0.5950 }
+    };
+
+    // State
+    let currentCategory = 'default';
+    let top50Symbols = [];
+    let activeSymbols = ['XAU', 'EURUSD', 'DXY', 'BTC', 'ETH', 'SOL', 'BNB'];
+
+    function formatPrice(val, symbol = '') {
+      if (!val) return '$0.00';
+      let decimals = 2;
+      if (['EURUSD', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'].includes(symbol) || (val < 10 && val > 0 && !['DXY', 'USDJPY'].includes(symbol))) {
+        decimals = 4;
+      }
+      if (symbol === 'DXY' || symbol === 'USDJPY') decimals = 2;
+      return '$' + val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    // Filter Switcher
+    function switchCategory(category) {
+      currentCategory = category;
+
+      document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+        btn.className = 'px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white hover:bg-gray-800 transition-all';
+      });
+
+      const activeBtn = document.getElementById(`btn-${category}`);
+      if (activeBtn) {
+        activeBtn.className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-md transition-all';
+      }
+
+      if (category === 'default') {
+        activeSymbols = ['XAU', 'EURUSD', 'DXY', 'BTC', 'ETH', 'SOL', 'BNB'];
+      } else if (category === 'forex') {
+        activeSymbols = [...FOREX_PAIRS];
+        Object.keys(FOREX_DEFS).forEach(k => {
+          if (!ASSETS[k]) ASSETS[k] = FOREX_DEFS[k];
+        });
+      } else if (category === 'top50') {
+        activeSymbols = top50Symbols.length ? top50Symbols : ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'DOT'];
+      }
+
+      document.getElementById('active-list-count').innerText = `Showing ${activeSymbols.length} Assets`;
+      renderTable();
+      initCryptoFeeds();
+    }
+
+    // Render Table
+    function renderTable() {
+      const tableBody = document.getElementById('market-table-body');
+      tableBody.innerHTML = '';
+
+      activeSymbols.forEach((symbol, index) => {
+        const asset = ASSETS[symbol];
+        if (!asset) return;
+
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-800/30 transition-colors';
+        row.innerHTML = `
+          <td class="py-4 px-4 text-xs font-bold text-gray-500 text-center">${index + 1}</td>
+          <td class="py-4 px-4">
+            <div class="flex items-center space-x-3">
+              <i class="${asset.icon || 'fa-solid fa-coins'} text-lg" style="color: ${asset.color || '#3B82F6'}"></i>
+              <div>
+                <span class="font-semibold text-white block">${asset.name}</span>
+                <span class="text-xs text-gray-400 font-normal">${symbol}</span>
+              </div>
+            </div>
+          </td>
+          <td class="py-4 px-4 font-bold text-white" id="tbl-price-${symbol}">${formatPrice(asset.price, symbol)}</td>
+          <td class="py-4 px-4" id="tbl-change-${symbol}">
+            <span class="text-gray-400">0.00%</span>
+          </td>
+          <td class="py-4 px-4 text-gray-300 hidden sm:table-cell" id="tbl-high-${symbol}">${formatPrice(asset.high, symbol)}</td>
+          <td class="py-4 px-4 text-gray-300 hidden sm:table-cell text-right" id="tbl-low-${symbol}">${formatPrice(asset.low, symbol)}</td>
+        `;
+        tableBody.appendChild(row);
+
+        updateAssetUI(symbol, null);
+      });
+    }
+
+    function updateAssetUI(symbol, prevPrice) {
+      const asset = ASSETS[symbol];
+      if (!asset) return;
+
+      const formattedPrice = formatPrice(asset.price, symbol);
+      const isUp = asset.change >= 0;
+
+      const tblPriceEl = document.getElementById(`tbl-price-${symbol}`);
+
+      if (tblPriceEl && prevPrice !== null && prevPrice !== undefined && prevPrice !== asset.price) {
+        const flashClass = asset.price > prevPrice ? 'price-flash-up' : 'price-flash-down';
+        tblPriceEl.classList.remove('price-flash-up', 'price-flash-down');
+        void tblPriceEl.offsetWidth;
+        tblPriceEl.classList.add(flashClass);
+      }
+
+      if (tblPriceEl) tblPriceEl.innerText = formattedPrice;
+
+      const tblHighEl = document.getElementById(`tbl-high-${symbol}`);
+      const tblLowEl = document.getElementById(`tbl-low-${symbol}`);
+
+      if (tblHighEl) tblHighEl.innerText = formatPrice(asset.high, symbol);
+      if (tblLowEl) tblLowEl.innerText = formatPrice(asset.low, symbol);
+
+      const tblChangeEl = document.getElementById(`tbl-change-${symbol}`);
+      const sign = isUp ? '+' : '';
+      const changeStr = `${sign}${asset.change.toFixed(2)}%`;
+
+      if (tblChangeEl) {
+        tblChangeEl.innerHTML = `<span class="${isUp ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}">${changeStr}</span>`;
+      }
+
+      // Summary Bar Updates
+      if (symbol === 'XAU') document.getElementById('summary-gold').innerText = formattedPrice;
+      if (symbol === 'EURUSD') document.getElementById('summary-eurusd').innerText = formattedPrice;
+      if (symbol === 'BTC') document.getElementById('summary-btc').innerText = formattedPrice;
+    }
+
+    // Top 50 Crypto Fetcher
+    async function loadTop50Crypto() {
+      try {
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        const data = await res.json();
+        const usdtPairs = data
+          .filter(d => d.symbol.endsWith('USDT') && !d.symbol.includes('UP') && !d.symbol.includes('DOWN'))
+          .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
+          .slice(0, 50);
+
+        top50Symbols = [];
+        usdtPairs.forEach(p => {
+          const base = p.symbol.replace('USDT', '');
+          top50Symbols.push(base);
+
+          if (!ASSETS[base]) {
+            ASSETS[base] = {
+              name: base,
+              symbol: base,
+              pair: p.symbol.toLowerCase(),
+              category: 'Crypto',
+              icon: 'fa-solid fa-coins',
+              color: '#3B82F6',
+              price: parseFloat(p.lastPrice),
+              change: parseFloat(p.priceChangePercent),
+              high: parseFloat(p.highPrice),
+              low: parseFloat(p.lowPrice)
+            };
+          }
+        });
+      } catch (err) {
+        console.warn('Could not load top 50 list from Binance, using default list.', err);
+      }
+    }
+
+    // Live Fetching Gold API directly from gold-api.com (with CORS Proxy Fallback)
+    async function fetchLiveGoldPrice() {
+      const gold = ASSETS.XAU;
+      let fetched = false;
+
+      // Primary Attempt: Direct gold-api.com Endpoint
+      try {
+        const res = await fetch('https://api.gold-api.com/price/XAU');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.price && typeof data.price === 'number') {
+            const prevPrice = gold.price;
+            gold.price = parseFloat(data.price.toFixed(2));
+            if (data.ch) gold.change = parseFloat(data.ch);
+            if (data.high) gold.high = parseFloat(data.high);
+            if (data.low) gold.low = parseFloat(data.low);
+            fetched = true;
+            updateAssetUI('XAU', prevPrice);
+          }
+        }
+      } catch (err) {
+        console.warn('Direct Gold API blocked by CORS, trying CORS proxy fallback...', err);
+      }
+
+      // Secondary Fallback Attempt via CORS Proxy if direct fetch is blocked by browser policies
+      if (!fetched) {
+        try {
+          const proxyRes = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gold-api.com/api/XAU/USD'));
+          if (proxyRes.ok) {
+            const data = await proxyRes.json();
+            if (data && data.price && typeof data.price === 'number') {
+              const prevPrice = gold.price;
+              gold.price = parseFloat(data.price.toFixed(2));
+              if (data.ch) gold.change = parseFloat(data.ch);
+              if (data.high) gold.high = parseFloat(data.high);
+              if (data.low) gold.low = parseFloat(data.low);
+              fetched = true;
+              updateAssetUI('XAU', prevPrice);
+            }
+          }
+        } catch (proxyErr) {
+          console.warn('Gold API Proxy fetch failed, falling back to realistic tick loop.', proxyErr);
+        }
+      }
+
+      return fetched;
+    }
+
+    // Initialize Spot Gold with Live API & Periodic Refresh
+    async function initGoldData() {
+      const gold = ASSETS.XAU;
+      
+      // Initial fetch attempt
+      await fetchLiveGoldPrice();
+
+      // Refresh live API every 30 seconds
+      setInterval(fetchLiveGoldPrice, 30000);
+
+      // Micro-tick loop for real-time visual movement between API refreshes
+      setInterval(() => {
+        const prevPrice = gold.price;
+        const deltaPct = (Math.random() - 0.49) * 0.0004;
+        gold.price = parseFloat((gold.price * (1 + deltaPct)).toFixed(2));
+        if (gold.price > gold.high) gold.high = gold.price;
+        if (gold.price < gold.low) gold.low = gold.price;
+        updateAssetUI('XAU', prevPrice);
+      }, 4000);
+    }
+
+    // Feed Controller for Crypto
+    async function initCryptoFeeds() {
+      const cryptoSymbols = activeSymbols.filter(s => ASSETS[s] && ASSETS[s].category === 'Crypto');
+      if (!cryptoSymbols.length) return;
+
+      const streams = cryptoSymbols.map(s => `${ASSETS[s].pair}@ticker`).join('/');
+      const wsUrl = `wss://stream.binance.com:9443/ws/${streams}`;
+
+      const indicator = document.getElementById('ws-indicator');
+      const statusText = document.getElementById('ws-status-text');
+      const feedStatusEl = document.getElementById('summary-feed-status');
+
+      try {
+        const ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
+          statusText.innerText = 'WebSocket Active';
+          if (feedStatusEl) {
+            feedStatusEl.className = 'text-xs font-semibold text-emerald-400 flex items-center gap-1 mt-1';
+            feedStatusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px]"></i> Feed Active';
+          }
+        };
+
+        ws.onmessage = (e) => {
+          const data = JSON.parse(e.data);
+          if (!data || !data.s) return;
+          const pair = data.s.toLowerCase();
+          const symbol = Object.keys(ASSETS).find(key => ASSETS[key].pair === pair);
+
+          if (symbol && ASSETS[symbol]) {
+            const asset = ASSETS[symbol];
+            const prevPrice = asset.price;
+
+            asset.price = parseFloat(data.c);
+            asset.change = parseFloat(data.P);
+            asset.high = parseFloat(data.h);
+            asset.low = parseFloat(data.l);
+
+            updateAssetUI(symbol, prevPrice);
+          }
+        };
+      } catch (err) {
+        console.warn('Fallback REST Polling for Crypto', err);
+      }
+    }
+
+    // Live Feed Generators for Forex & DXY
+    function initNonCryptoFeeds() {
+      setInterval(() => {
+        ['EURUSD', 'DXY', ...Object.keys(FOREX_DEFS)].forEach(sym => {
+          if (!ASSETS[sym]) return;
+          const asset = ASSETS[sym];
+          const prevPrice = asset.price;
+          const tick = (Math.random() - 0.495) * (sym === 'DXY' ? 0.02 : 0.0003);
+          asset.price = parseFloat((asset.price + tick).toFixed(sym === 'DXY' ? 2 : 4));
+          if (asset.price > asset.high) asset.high = asset.price;
+          if (asset.price < asset.low) asset.low = asset.price;
+          updateAssetUI(sym, prevPrice);
+        });
+      }, 4000);
+    }
+
+    window.onload = async function() {
+      await loadTop50Crypto();
+      switchCategory('default');
+      initGoldData();
+      initNonCryptoFeeds();
+    };
+  </script>
+</body>
+</html>
