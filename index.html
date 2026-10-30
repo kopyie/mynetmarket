@@ -288,11 +288,14 @@
 
         const row = document.createElement('tr');
         row.className = 'hover:bg-gray-800/30 transition-colors';
+        const assetIcon = asset.category === 'Crypto'
+          ? `<span class="relative h-6 w-6 shrink-0"><img data-asset-logo src="https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png" alt="" class="h-6 w-6 rounded-full object-contain"><i class="${asset.icon || 'fa-solid fa-coins'} hidden text-lg" style="color: ${asset.color || '#3B82F6'}" aria-hidden="true"></i></span>`
+          : `<i class="${asset.icon || 'fa-solid fa-coins'} text-lg" style="color: ${asset.color || '#3B82F6'}" aria-hidden="true"></i>`;
         row.innerHTML = `
           <td class="py-4 px-4 text-xs font-bold text-gray-500 text-center">${index + 1}</td>
           <td class="py-4 px-4">
             <div class="flex items-center space-x-3">
-              <i class="${asset.icon || 'fa-solid fa-coins'} text-lg" style="color: ${asset.color || '#3B82F6'}"></i>
+              ${assetIcon}
               <div>
                 <span class="font-semibold text-white block">${asset.name}</span>
                 <span class="text-xs text-gray-400 font-normal">${symbol}</span>
@@ -307,6 +310,12 @@
           <td class="py-4 px-4 text-gray-300 hidden sm:table-cell text-right" id="tbl-low-${symbol}">${formatPrice(asset.low, symbol)}</td>
         `;
         tableBody.appendChild(row);
+
+        const logoImage = row.querySelector('img[data-asset-logo]');
+        logoImage?.addEventListener('error', () => {
+          logoImage.classList.add('hidden');
+          logoImage.nextElementSibling?.classList.remove('hidden');
+        }, { once: true });
 
         updateAssetUI(symbol, null);
       });
