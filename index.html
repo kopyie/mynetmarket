@@ -118,8 +118,8 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-    <!-- Overview Bar (4 Containers) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <!-- Overview Bar -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
       <!-- 1. Spot Gold -->
       <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
         <div class="p-3 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -142,18 +142,6 @@
         </div>
       </div>
 
-      <!-- 3. Feed Status -->
-      <div class="glass-panel p-4 rounded-xl flex items-center space-x-4">
-        <div class="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
-          <i class="fa-solid fa-rotate text-xl"></i>
-        </div>
-        <div>
-          <span class="text-xs text-gray-400 block font-medium">Feed Status</span>
-          <span id="summary-feed-status" class="text-xs font-semibold text-emerald-400 flex items-center gap-1 mt-1">
-            <i class="fa-solid fa-circle text-[8px]"></i> Initializing...
-          </span>
-        </div>
-      </div>
     </div>
 
     <!-- Category Selector Controls -->
@@ -501,17 +489,12 @@
 
       const indicator = document.getElementById('ws-indicator');
       const statusText = document.getElementById('ws-status-text');
-      const feedStatusEl = document.getElementById('summary-feed-status');
 
       try {
         const ws = new WebSocket(wsUrl);
         ws.onopen = () => {
           indicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
           statusText.innerText = 'WebSocket Active';
-          if (feedStatusEl) {
-            feedStatusEl.className = 'text-xs font-semibold text-emerald-400 flex items-center gap-1 mt-1';
-            feedStatusEl.innerHTML = '<i class="fa-solid fa-circle text-[8px]"></i> Feed Active';
-          }
         };
 
         ws.onmessage = (e) => {
