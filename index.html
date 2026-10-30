@@ -100,6 +100,18 @@
       <p id="forex-widget-status" class="text-xs text-gray-500 mt-1">
         Loading major forex quotes…
       </p>
+      <div class="mt-2 grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:gap-3" aria-label="World clocks">
+        <div class="rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
+          <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
+          <time id="utc-clock" class="block font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
+          <span id="utc-date" class="block text-[10px] text-gray-500"></span>
+        </div>
+        <div class="rounded-lg border border-gray-800 bg-gray-900/70 px-3 py-2">
+          <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
+          <time id="myanmar-clock" class="block font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
+          <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -221,6 +233,37 @@
     let top50Symbols = [];
     let activeSymbols = ['XAU', 'BTC', 'ETH', 'SOL', 'BNB'];
     let tradingViewWidgetsLoaded = false;
+
+    function updateWorldClocks() {
+      const now = new Date();
+      const clockOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23'
+      };
+      const dateOptions = {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      };
+      const timeZones = [
+        { name: 'utc', timeZone: 'UTC' },
+        { name: 'myanmar', timeZone: 'Asia/Yangon' }
+      ];
+
+      timeZones.forEach(({ name, timeZone }) => {
+        document.getElementById(`${name}-clock`).innerText = new Intl.DateTimeFormat('en-GB', {
+          ...clockOptions,
+          timeZone
+        }).format(now);
+        document.getElementById(`${name}-date`).innerText = new Intl.DateTimeFormat('en-GB', {
+          ...dateOptions,
+          timeZone
+        }).format(now);
+      });
+    }
 
     function formatPrice(val, symbol = '') {
       if (!Number.isFinite(val) || val <= 0) return '—';
@@ -495,6 +538,8 @@
     }
 
     window.onload = async function() {
+      updateWorldClocks();
+      setInterval(updateWorldClocks, 1000);
       loadTradingViewForexWidget();
       await loadTop50Crypto();
       switchCategory('default');
