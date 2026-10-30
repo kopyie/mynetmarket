@@ -72,7 +72,7 @@
   <!-- Header -->
   <header class="glass-panel sticky top-0 z-50 border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-      <div class="flex flex-wrap items-center gap-3">
+      <div class="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-2 sm:flex sm:gap-3">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <i class="fa-solid font-bold text-white text-lg fa-chart-line"></i>
@@ -85,24 +85,24 @@
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2" aria-label="World clocks">
-          <div class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/70 px-2.5 py-1.5">
+        <div class="col-span-2 row-start-2 flex items-center justify-center gap-2 sm:col-span-1 sm:row-auto sm:justify-start" aria-label="World clocks">
+          <div class="flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-800 bg-gray-900/70 px-2 py-1.5">
             <div>
-              <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">UTC</span>
-              <span id="utc-date" class="block text-[10px] text-gray-500"></span>
+              <span id="utc-date" class="hidden text-[10px] text-gray-500 sm:block"></span>
             </div>
-            <time id="utc-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="UTC time">--:--:--</time>
+            <time id="utc-clock" class="font-mono text-xs font-semibold tabular-nums text-white sm:text-sm" aria-label="UTC time">--:--:--</time>
+            <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">(UTC)</span>
           </div>
-          <div class="flex items-center gap-2 rounded-lg border border-gray-800 bg-gray-900/70 px-2.5 py-1.5">
+          <div class="flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-gray-800 bg-gray-900/70 px-2 py-1.5">
             <div>
-              <span class="block text-[10px] font-semibold uppercase tracking-wide text-gray-400">Myanmar (MMT)</span>
-              <span id="myanmar-date" class="block text-[10px] text-gray-500"></span>
+              <span id="myanmar-date" class="hidden text-[10px] text-gray-500 sm:block"></span>
             </div>
-            <time id="myanmar-clock" class="font-mono text-sm font-semibold tabular-nums text-white" aria-label="Myanmar time">--:--:--</time>
+            <time id="myanmar-clock" class="font-mono text-xs font-semibold tabular-nums text-white sm:text-sm" aria-label="Myanmar time">--:--:--</time>
+            <span class="text-[10px] font-semibold uppercase tracking-wide text-gray-400">(MMT)</span>
           </div>
         </div>
 
-        <div class="ml-auto flex items-center space-x-2 self-start rounded-lg border border-gray-800 bg-gray-900/80 px-3 py-1.5 text-xs">
+        <div class="col-start-2 row-start-1 ml-auto flex items-center space-x-2 rounded-lg border border-gray-800 bg-gray-900/80 px-3 py-1.5 text-xs">
           <span id="ws-indicator" class="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse"></span>
           <span id="ws-status-text" class="text-gray-300 font-medium hidden sm:inline">Connecting...</span>
         </div>
